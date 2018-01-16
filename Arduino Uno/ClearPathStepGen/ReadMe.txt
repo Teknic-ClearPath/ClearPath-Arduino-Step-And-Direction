@@ -46,7 +46,7 @@ In an Arduino Mega, PORTA refers to pins, 22-29, so to modify this library to us
 
 1) Do a find/replace all replacing "PORTB" with "PORTA"  (case sensitive, ignore quotes).
 
-2) Do a find/replace all replacing "->getDirPin()-8" with "->getDirPin()-22" (case sensitive, ignore quotes).
+2) Do a find/replace all replacing "->PinB-8" with "->PinB-22" (case sensitive, ignore quotes).
 
 After this, you could use an Arduino Mega and connect input B to pins 22-29
 
