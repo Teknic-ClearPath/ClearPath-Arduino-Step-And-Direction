@@ -283,6 +283,7 @@ void ClearPathMotorSD::attach(int APin, int BPin, int EPin, int HPin)
 */
 void ClearPathMotorSD::stopMove()
 {
+	cli();
 	_PX=0;
 	_VX=0;
      _OPX=0;
@@ -293,6 +294,7 @@ void ClearPathMotorSD::stopMove()
 	 _BurstX=0;
 	 moveStateX = 3;
      CommandX=0;
+	 sei();
 }
 
 /*		
