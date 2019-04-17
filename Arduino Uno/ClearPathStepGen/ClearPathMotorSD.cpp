@@ -68,9 +68,9 @@ int ClearPathMotorSD::calcSteps()
 
  if(CommandX == 0) //If no/finished command/, do nothing set everything to 0
 {
-                _PX=0;
-                _VX=0;
-                _OPX=0;
+                MovePosnQx=0;
+                VelRefQx=0;
+                StepsSent=0;
                 _TX=0;
                 _TX1=0;
                 _TX2=0;
@@ -80,25 +80,25 @@ int ClearPathMotorSD::calcSteps()
 else
 {
 			// Compute Move parameters
-			_ZX = CommandX<<_bitshift;
-			_ZX2 = abs(_ZX>>1);
-			if(_ZX > 0)
-				_AXS = _AXMX;
+			TargetPosnQx = CommandX<<fractionalBits;
+			TriangleMovePeakQx = abs(TargetPosnQx>>1);
+			if(TargetPosnQx > 0)
+				AccelRefQxS = AccLimitQx;
 			else
-				_AXS = -_AXMX;
-			_AX = _AXS;
+				AccelRefQxS = -AccLimitQx;
+			AccelRefQx = AccelRefQxS;
 			// Do immediate move if half move length <= maximum acceleration.
-			if(_ZX2 <= _AXMX) {
-				_AX = 0;
-				_VX = 0;
-				_PX = _ZX;
+			if(TriangleMovePeakQx <= AccLimitQx) {
+				AccelRefQx = 0;
+				VelRefQx = 0;
+				MovePosnQx = TargetPosnQx;
 				moveStateX = 3;	//Set to Move Idle
                 CommandX=0;		//Zero command
 				break;
 			}
 			// Otherwise, execute move and go to Phase1
-			_PX = _PX + _VX;// + (_AX>>1);
-	                _VX = _VX + _AX;
+			MovePosnQx = MovePosnQx + VelRefQx;// + (AccelRefQx>>1);
+	                VelRefQx = VelRefQx + AccelRefQx;
 			moveStateX = 1;
 }
 			break;
@@ -106,11 +106,11 @@ else
 		case 1:		//Phase 1 first half of move
 			
 			// Execute move
-			_PX = _PX + _VX + (_AX>>1);
-	                _VX = _VX + _AX;
+			MovePosnQx = MovePosnQx + VelRefQx + (AccelRefQx>>1);
+	                VelRefQx = VelRefQx + AccelRefQx;
 
 			// Check position.
-			if(abs(_PX) >= _ZX2) {
+			if(abs(MovePosnQx) >= TriangleMovePeakQx) {
 				// If half move reached, compute time parameters and go to PXhase2
 
 				if(_flag)		//This makes sure you go one step past half in order to make sure Phase 2 goes well
@@ -121,7 +121,7 @@ else
 				if(_TX2 == 0) {
 					_TX2 = _TX;
 				}
-				_AX = -_AX;					//Set deccelleration
+				AccelRefQx = -AccelRefQx;					//Set deccelleration
 				_TX3 = (_TX2<<1) - _TX1;	//compute time params
 				_TAUX = _TX2<<1;
 				moveStateX = 2;			//Start Phase 2
@@ -131,15 +131,15 @@ else
 			}
 			else {
 				// Otherwise, check velocity.
-				if(labs(_VX) >= _VMX) {
-					// If maximum velocity reached, compute TX1 and set AX = 0, and _VX=_VMX.
+				if(labs(VelRefQx) >= VelLimitQx) {
+					// If maximum velocity reached, compute TX1 and set AX = 0, and VelRefQx=VelLimitQx.
 					if(_TX1 == 0) {
-						_AX = 0;
+						AccelRefQx = 0;
 						_TX1 = _TX;
-						if(_VX > 0)
-                          _VX=_VMX;
+						if(VelRefQx > 0)
+                          VelRefQx=VelLimitQx;
 						else
-                          _VX=-_VMX;
+                          VelRefQx=-VelLimitQx;
 					}
 				}
 			}
@@ -147,18 +147,18 @@ else
 
 		case 2:		//Phase 2 2nd half of move
 			// Execute move
-			_PX = _PX + _VX + (_AX>>1);
-	                _VX = _VX + _AX;
+			MovePosnQx = MovePosnQx + VelRefQx + (AccelRefQx>>1);
+	                VelRefQx = VelRefQx + AccelRefQx;
 
 			// Check time.
 			if(_TX >= _TX3) {
 				// If beyond TX3, wait for done condition.
-				_AX = -_AXS;
-				if((_TX > _TAUX) || (labs(_PX) > labs(_ZX)) || (_VX*_AX > 0)) {
+				AccelRefQx = -AccelRefQxS;
+				if((_TX > _TAUX) || (labs(MovePosnQx) > labs(TargetPosnQx)) || (VelRefQx*AccelRefQx > 0)) {
             	// If done, enforce final position.
-					_AX = 0;
-					_VX = 0;
-					_PX = _ZX;
+					AccelRefQx = 0;
+					VelRefQx = 0;
+					MovePosnQx = TargetPosnQx;
 					moveStateX = 3;
 					CommandX=0;
 				}
@@ -166,9 +166,9 @@ else
 			break;
 	}
 	// Compute burst value
-	_BurstX = (_PX - _OPX)>>_bitshift;
+	_BurstX = (MovePosnQx - StepsSent)>>fractionalBits;
 	// Update accumulated integer position
-	_OPX += (long)(_BurstX)<<_bitshift;
+	StepsSent += (long)(_BurstX)<<fractionalBits;
 
 	//check which direction, and incement absPosition
 	if(_direction)
@@ -191,23 +191,23 @@ ClearPathMotorSD::ClearPathMotorSD()
   PinE=0;
   PinH=0;
   Enabled=false;
-_VMX=0;					
-_AXMX=0;
-_PX=0;				
-_OPX=0;				
- _VX=0;				
-_AX=0;					
+VelLimitQx=0;					
+AccLimitQx=0;
+MovePosnQx=0;				
+StepsSent=0;				
+ VelRefQx=0;				
+AccelRefQx=0;					
 _TX=0;					
 _TX1=0;				
  _TX2=0;				
 _TX3=0;			
 _TAUX=0;					
 _flag=0;
-_AXS=0;					
- _ZX=0;				
-_ZX2=0;					
+AccelRefQxS=0;					
+ TargetPosnQx=0;				
+TriangleMovePeakQx=0;					
 CommandX=0;
-_bitshift=10;
+fractionalBits=10;
 _BurstX=0;
 AbsPosition=0;
 }
@@ -284,9 +284,9 @@ void ClearPathMotorSD::attach(int APin, int BPin, int EPin, int HPin)
 void ClearPathMotorSD::stopMove()
 {
 	cli();
-	_PX=0;
-	_VX=0;
-     _OPX=0;
+	MovePosnQx=0;
+	VelRefQx=0;
+     StepsSent=0;
      _TX=0;
      _TX1=0;
      _TX2=0;
@@ -341,9 +341,9 @@ void ClearPathMotorSD::setMaxVel(long velMax)
 {
 	int n = velMax/2000;
 	if(n<51)
-		_VMX=(velMax*(1<<_bitshift))/2000;
+		VelLimitQx=(velMax*(1<<fractionalBits))/2000;
 	else
-		_VMX=50*(1<<_bitshift);
+		VelLimitQx=50*(1<<fractionalBits);
 
 }
 /*		
@@ -352,7 +352,7 @@ void ClearPathMotorSD::setMaxVel(long velMax)
 */
 void ClearPathMotorSD::setMaxAccel(long accelMax)
 {
-  _AXMX=(accelMax*(1<<_bitshift))/4000000;
+  AccLimitQx=(accelMax*(1<<fractionalBits))/4000000;
 }
 
 
@@ -410,10 +410,10 @@ void ClearPathMotorSD::disable()
 
 	if(PinE!=0)
 		digitalWrite(PinE,LOW);
-	_PX=0;
+	MovePosnQx=0;
     Enabled=false;
-	_VX=0;
-     _OPX=0;
+	VelRefQx=0;
+     StepsSent=0;
      _TX=0;
      _TX1=0;
      _TX2=0;

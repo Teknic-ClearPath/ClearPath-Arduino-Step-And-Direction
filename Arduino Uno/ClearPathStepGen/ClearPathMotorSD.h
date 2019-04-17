@@ -85,22 +85,22 @@ class ClearPathMotorSD
 // All of the position, velocity and acceleration parameters are signed and in Q24.8,
 // with all arithmetic performed in fixed point.
 
- long _VMX;					// Velocity limit
- long _AXMX;					// Acceleration limit
- long _PX;					// Current position
- long _OPX;				// Accumulated integer position
- long _VX;					// Current velocity
- long _AX;					// Current acceleration
+ int32_t VelLimitQx;					// Velocity limit
+ int32_t AccLimitQx;					// Acceleration limit
+ uint32_t MovePosnQx;					// Current position
+ uint32_t StepsSent;				// Accumulated integer position
+ int32_t VelRefQx;					// Current velocity
+ int32_t AccelRefQx;					// Current acceleration
  long _TX;					// Current time
  long _TX1;				// End of ramp up time
  long _TX2;				// Beginning of phase 2 time
  long _TX3;				// Beginning of ramp down time
  long _TAUX;					// Integer burst value
  boolean _flag;
- long _AXS;					// Signed acceleration limit
- long _ZX;						// Move length in Q24.8
- long _ZX2;	
- uint8_t _bitshift;
+ int32_t AccelRefQxS;					// Signed acceleration limit
+ long TargetPosnQx;						// Move length in Q24.8
+ long TriangleMovePeakQx;	
+ uint8_t fractionalBits;
 
 };
 #endif
