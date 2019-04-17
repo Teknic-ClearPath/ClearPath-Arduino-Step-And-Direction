@@ -68,55 +68,55 @@ ISR(TIMER2_COMPA_vect)
 	  
 
 	  
-//loop through BurstSteps decrementing each value to 0	  
-do
-{
+	//loop through BurstSteps decrementing each value to 0	  
+	do
+	{
 
-	 _flag=false;
+		_flag=false;
 
- _OutputBits = PORTB;	//Read the port
+		_OutputBits = PORTB;	//Read the port
 
-if(_BurstSteps[0] && _BurstSteps[0]--)	//Assume at least one axis is active, and check/decrement BurstSteps
-{
-		_flag=true;
-_OutputBits |= _pins[0];	//Activate the B input for motor 1
-}
-if(_pins[1] > 0 && _BurstSteps[1] && _BurstSteps[1]--)	//Check if Axis is active, then check/decrement BurstSteps
-{
-		_flag=true;
-_OutputBits |= _pins[1];	//Activate the B input for motor 2
-}
-if(_pins[2] > 0 && _BurstSteps[2] && _BurstSteps[2]--)	//Check if Axis is active, then check/decrement BurstSteps
-{
-		_flag=true;
-_OutputBits |= _pins[2];	//Activate the B input for motor 3
-}
-if(_pins[3] > 0 && _BurstSteps[3] && _BurstSteps[3]--)	//Check if Axis is active, then check/decrement BurstSteps
-{
-		_flag=true;
-_OutputBits |= _pins[3];	//Activate the B input for motor 4
-}
-if(_pins[4] > 0 && _BurstSteps[4] && _BurstSteps[4]--)	//Check if Axis is active, then check/decrement BurstSteps
-{
-		_flag=true;
-_OutputBits |= _pins[4];	//Activate the B input for motor 5
-}
-if(_pins[5] > 0 && _BurstSteps[5] && _BurstSteps[5]--)	//Check if Axis is active, then check/decrement BurstSteps
-{
-		_flag=true; 
-_OutputBits |= _pins[5];	//Activate the B input for motor 6
-}
-PORTB = _OutputBits;			//Write to the ports
-  delayMicroseconds(2);			//Short Delay
-	_OutputBits &=63-_SUMPINS ;	//Turn off all active pins
-  PORTB = _OutputBits;			//Write to the ports
-  
-} while(_flag);
+		if(_BurstSteps[0] && _BurstSteps[0]--)	//Assume at least one axis is active, and check/decrement BurstSteps
+		{
+			_flag=true;
+			_OutputBits |= _pins[0];	//Activate the B input for motor 1
+		}
+		if(_pins[1] > 0 && _BurstSteps[1] && _BurstSteps[1]--)	//Check if Axis is active, then check/decrement BurstSteps
+		{
+			_flag=true;
+			_OutputBits |= _pins[1];	//Activate the B input for motor 2
+		}
+		if(_pins[2] > 0 && _BurstSteps[2] && _BurstSteps[2]--)	//Check if Axis is active, then check/decrement BurstSteps
+		{
+			_flag=true;
+			_OutputBits |= _pins[2];	//Activate the B input for motor 3
+		}
+		if(_pins[3] > 0 && _BurstSteps[3] && _BurstSteps[3]--)	//Check if Axis is active, then check/decrement BurstSteps
+		{
+			_flag=true;
+			_OutputBits |= _pins[3];	//Activate the B input for motor 4
+		}
+		if(_pins[4] > 0 && _BurstSteps[4] && _BurstSteps[4]--)	//Check if Axis is active, then check/decrement BurstSteps
+		{
+			_flag=true;
+			_OutputBits |= _pins[4];	//Activate the B input for motor 5
+		}
+		if(_pins[5] > 0 && _BurstSteps[5] && _BurstSteps[5]--)	//Check if Axis is active, then check/decrement BurstSteps
+		{
+			_flag=true; 
+			_OutputBits |= _pins[5];	//Activate the B input for motor 6
+		}
+		PORTB = _OutputBits;			//Write to the ports
+		delayMicroseconds(2);			//Short Delay
+		_OutputBits &=63-_SUMPINS ;	//Turn off all active pins
+		PORTB = _OutputBits;			//Write to the ports
 
-//turn off debug pin
-//digitalWrite(2,LOW);
-//allow interupts
-sei();
+	} while(_flag);
+
+	//turn off debug pin
+	//digitalWrite(2,LOW);
+	//allow interupts
+	sei();
 
 }
 
@@ -131,12 +131,11 @@ ClearPathStepGen::ClearPathStepGen(ClearPathMotorSD* motor1)
 {
 	_SUMPINS=0;
 	_flag=false;
-   _numAxis=1;
-   _motors[0]=motor1;
-   if(_motors[0]->PinB-8 >= 0)
-	_pins[0]=(1<<(_motors[0]->PinB-8));
-   _SUMPINS=_pins[0];
-  
+	_numAxis=1;
+	_motors[0]=motor1;
+	if(_motors[0]->PinB-8 >= 0)
+		_pins[0]=(1<<(_motors[0]->PinB-8));
+	_SUMPINS=_pins[0];
 }
 
 /* This is a constructor for ClearPathStepGen, it requires 2 pointer to ClearPathMotorSD, or
@@ -150,15 +149,14 @@ ClearPathStepGen::ClearPathStepGen(ClearPathMotorSD* motor1, ClearPathMotorSD* m
 {
 	_SUMPINS=0;
 	_flag=false;
-   _numAxis=2;
-   _motors[0]=motor1;
-   _motors[1]=motor2;
-   if(_motors[0]->PinB-8 >= 0)
-	_pins[0]=(1<<(_motors[0]->PinB-8));
-   if(_motors[1]->PinB-8 >= 0)
-    _pins[1]=(1<<(_motors[1]->PinB-8));
-   _SUMPINS=_pins[0]+_pins[1];
-  
+	_numAxis=2;
+	_motors[0]=motor1;
+	_motors[1]=motor2;
+	if(_motors[0]->PinB-8 >= 0)
+		_pins[0]=(1<<(_motors[0]->PinB-8));
+	if(_motors[1]->PinB-8 >= 0)
+		_pins[1]=(1<<(_motors[1]->PinB-8));
+	_SUMPINS=_pins[0]+_pins[1];
 }
 
 /* This is a constructor for ClearPathStepGen, it requires 3 pointer to ClearPathMotorSD, or
@@ -288,11 +286,11 @@ void ClearPathStepGen::Start()
 	int time = 249;   //Set Frequency 2kHz
 	_SUMPINS=0;
 	for( int i=0; i<_numAxis; i++)
-   {
-	   if(_motors[i]->PinB-8 >= 0)
+	{
+		if(_motors[i]->PinB-8 >= 0)
 			_pins[i]=(1<<(_motors[i]->PinB-8));
-	   _SUMPINS+=_pins[i];
-   }
+		_SUMPINS+=_pins[i];
+	}
 	
 	cli();//stop interrupts
 
@@ -327,8 +325,8 @@ void ClearPathStepGen::Stop()
 {
 	cli();//stop interrupts
 //   
-   // set up Timer 1
-   TCCR2A = 0;// set entire TCCR2A register to 0
+	// set up Timer 1
+	TCCR2A = 0;// set entire TCCR2A register to 0
   TCCR2B = 0;// same for TCCR2B
   TCNT2  = 0;//initialize counter value to 0
 
