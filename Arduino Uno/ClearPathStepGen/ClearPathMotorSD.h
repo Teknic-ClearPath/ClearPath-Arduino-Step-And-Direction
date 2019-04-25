@@ -58,6 +58,7 @@ class ClearPathMotorSD
   void attach(int, int, int);
   void attach(int, int, int, int);
   boolean move(long);
+  bolean moveFast(long);
   void enable();
   long getCommandedPosition();
   boolean readHLFB();

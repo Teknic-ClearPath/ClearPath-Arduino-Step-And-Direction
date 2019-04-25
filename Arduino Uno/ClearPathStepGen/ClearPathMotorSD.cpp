@@ -160,6 +160,19 @@ int ClearPathMotorSD::calcSteps()
 				}
 			}
 			break;
+		case 4:		//Fast move case
+			// Execute move
+			if(_commandX>50){
+				_BurstX=50;
+				_commandX=_commandX-50;
+			}
+			else{
+				_BurstX=_commandX;
+				_commandX=0;
+				moveStateX = 3;
+			}
+
+			break;
 	}
 	// Compute burst value
 	_BurstX = (MovePosnQx - StepsSent)>>fractionalBits;
@@ -329,6 +342,44 @@ boolean ClearPathMotorSD::move(long dist)
 
 }
 
+/*		
+	This function commands a directional move which will burst out steps as fast as possible with no acceleration or velocity limits
+*/
+boolean ClearPathMotorSD::moveFast(long dist)
+{
+  if(CommandX==0)
+  {
+	  if(dist<0)
+	  {
+		  if(PinA!=0)
+		  {
+			  digitalWrite(PinA,HIGH);
+			  _direction=true;
+		  }
+		  cli();
+		  moveStateX = 3;
+		  CommandX=-dist;
+		  sei();
+		  
+	  }
+	  else
+	  {
+		  if(PinA!=0)
+		  {
+			  digitalWrite(PinA,LOW);
+			  _direction=false;
+		  }
+			cli();
+			moveStateX = 3;
+			CommandX=dist;
+			sei();
+	  }
+	  return true;
+  }
+  else
+	  return false;
+
+}
 /*		
 	This function sets the velocity in Counts/sec assuming the ISR frequency is 2kHz.
 	The maximum value for velMax is 100,000, the minimum is 2
