@@ -149,7 +149,7 @@ int ClearPathMotorSD::calcSteps()
 			// Check time.
 			if(_TX >= _TX3) {
 				// If beyond TX3, wait for done condition.
-				AccelRefQx = -AccelRefQxS;
+				AccelRefQx = -AccelRefQx;
 				if((_TX > _TAUX) || (labs(MovePosnQx) > labs(TargetPosnQx)) || (VelRefQx*AccelRefQx > 0)) {
             	// If done, enforce final position.
 					AccelRefQx = 0;
@@ -162,13 +162,13 @@ int ClearPathMotorSD::calcSteps()
 			break;
 		case 4:		//Fast move case
 			// Execute move
-			if(_commandX>50){
+			if(CommandX>50){
 				_BurstX=50;
-				_commandX=_commandX-50;
+				CommandX=CommandX-50;
 			}
 			else{
-				_BurstX=_commandX;
-				_commandX=0;
+				_BurstX=CommandX;
+				CommandX=0;
 				moveStateX = 3;
 			}
 
@@ -212,7 +212,7 @@ ClearPathMotorSD::ClearPathMotorSD()
 	_TX3=0;			
 	_TAUX=0;					
 	_flag=0;
-	AccelRefQxS=0;					
+	AccelRefQx=0;					
 	TargetPosnQx=0;				
 	TriangleMovePeakQx=0;					
 	CommandX=0;
