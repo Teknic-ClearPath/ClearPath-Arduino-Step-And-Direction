@@ -8,6 +8,7 @@ readHLFB			KEYWORD1
 attach				KEYWORD1
 stopMove			KEYWORD1
 move				KEYWORD1
+moveFast			KEYWORD1
 commandDone			KEYWORD1
 getCommandedPosition	KEYWORD1
 setMaxVel			KEYWORD1

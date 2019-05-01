@@ -162,12 +162,13 @@ int ClearPathMotorSD::calcSteps()
 			break;
 		case 4:		//Fast move case
 			// Execute move
-			if(CommandX>50){
-				_BurstX=50;
-				CommandX=CommandX-50;
+			TargetPosnQx = CommandX<<fractionalBits;
+				MovePosnQx = TargetPosnQx;
+			if(TargetPosnQx-MovePosnQx>50<<fractionalBits){
+				MovePosnQx=MovePosnQx+50<<fractionalBits;
 			}
 			else{
-				_BurstX=CommandX;
+				MovePosnQx = TargetPosnQx;
 				CommandX=0;
 				moveStateX = 3;
 			}
@@ -357,7 +358,7 @@ boolean ClearPathMotorSD::moveFast(long dist)
 			  _direction=true;
 		  }
 		  cli();
-		  moveStateX = 3;
+		  moveStateX = 4;
 		  CommandX=-dist;
 		  sei();
 		  
@@ -370,7 +371,7 @@ boolean ClearPathMotorSD::moveFast(long dist)
 			  _direction=false;
 		  }
 			cli();
-			moveStateX = 3;
+			moveStateX = 4;
 			CommandX=dist;
 			sei();
 	  }
