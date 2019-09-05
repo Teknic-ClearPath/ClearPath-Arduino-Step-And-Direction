@@ -98,6 +98,7 @@ class ClearPathMotorSD
  long _TX3;				// Beginning of ramp down time
  long _TAUX;					// Integer burst value
  boolean _flag;
+ int32_t AccelRefQxS;
  long TargetPosnQx;						// Move length in Q24.8
  long TriangleMovePeakQx;	
  uint8_t fractionalBits;

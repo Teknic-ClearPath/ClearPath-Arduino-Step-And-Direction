@@ -81,8 +81,12 @@ int ClearPathMotorSD::calcSteps()
 			{
 				// Compute Move parameters
 				TargetPosnQx = CommandX<<fractionalBits;
-				TriangleMovePeakQx = TargetPosnQx>>1;
-				AccelRefQx = AccLimitQx;
+				TriangleMovePeakQx = abs(TargetPosnQx>>1);
+				if(TargetPosnQx > 0)
+					AccelRefQxS = AccLimitQx;
+				else
+					AccelRefQxS = -AccLimitQx;
+				AccelRefQx = AccelRefQxS;
 				// Do immediate move if half move length <= maximum acceleration.
 				if(TriangleMovePeakQx <= AccLimitQx) {
 					AccelRefQx = 0;
@@ -149,7 +153,7 @@ int ClearPathMotorSD::calcSteps()
 			// Check time.
 			if(_TX >= _TX3) {
 				// If beyond TX3, wait for done condition.
-				AccelRefQx = -AccelRefQx;
+				AccelRefQx = -AccelRefQxS;
 				if((_TX > _TAUX) || (labs(MovePosnQx) > labs(TargetPosnQx)) || (VelRefQx*AccelRefQx > 0)) {
             	// If done, enforce final position.
 					AccelRefQx = 0;
@@ -213,7 +217,7 @@ ClearPathMotorSD::ClearPathMotorSD()
 	_TX3=0;			
 	_TAUX=0;					
 	_flag=0;
-	AccelRefQx=0;					
+	AccelRefQxS=0;					
 	TargetPosnQx=0;				
 	TriangleMovePeakQx=0;					
 	CommandX=0;
