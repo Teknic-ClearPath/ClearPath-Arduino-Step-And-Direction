@@ -2,8 +2,8 @@
   SingleAxisDemo
   Runs a Teknic ClearPath SDSK or SDHP motor, back and forth
  
- 
- This example code is in the public domain.
+  Copyright (c) 2017 Teknic Inc. This work is free to use, copy and distribute under the terms of the standard
+  MIT permissive software license which can be found at https://opensource.org/licenses/MIT
  */
 
 //Import Required libraries
