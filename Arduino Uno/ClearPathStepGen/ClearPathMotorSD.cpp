@@ -327,6 +327,7 @@ boolean ClearPathMotorSD::move(long dist)
 		  if(PinA!=0)
 		  {
 			  digitalWrite(PinA,HIGH);
+			  delay(1);
 			  _direction=true;
 		  }
 		  CommandX=-dist;
@@ -336,6 +337,7 @@ boolean ClearPathMotorSD::move(long dist)
 		  if(PinA!=0)
 		  {
 			  digitalWrite(PinA,LOW);
+			  delay(1);
 			  _direction=false;
 		  }
 			CommandX=dist;
@@ -458,18 +460,9 @@ void ClearPathMotorSD::enable()
 */
 void ClearPathMotorSD::disable()
 {
-
+	stopMove();
 	if(PinE!=0)
 		digitalWrite(PinE,LOW);
-	MovePosnQx=0;
 	Enabled=false;
-	VelRefQx=0;
-	StepsSent=0;
-	_TX=0;
-	_TX1=0;
-	_TX2=0;
-	_TX3=0;
-	_BurstX=0;
-	moveStateX = 3;
-	CommandX=0;
+	
 }
